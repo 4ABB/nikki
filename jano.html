@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falling In Love | Jano & You</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+        
+        body {
+            background-color: #030303;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        #intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        
+        .card-glow-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 105%;
+            height: 105%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, transparent, rgba(244, 63, 94, 0.4), transparent, rgba(255, 95, 162, 0.4), transparent);
+            background-size: 200% 200%;
+            border-radius: 46px;
+            z-index: -1;
+            filter: blur(15px);
+            animation: moveGradient 3s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes moveGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: border 0.3s ease, box-shadow 0.3s ease;
+            z-index: 10;
+            position: relative;
+            
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .glass-card:hover {
+            border: 1px solid rgba(255, 95, 162, 0.4);
+            box-shadow: 0 0 50px rgba(255, 95, 162, 0.15);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 20px rgba(244, 63, 94, 0.5);
+        }
+
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.1;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        #custom-cursor {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 95, 162, 0.1) 0%, rgba(244, 63, 94, 0.05) 30%, transparent 70%);
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+
+        .avatar-glow {
+            box-shadow: 0 0 30px rgba(255, 95, 162, 0.2);
+        }
+
+        .pulse-loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating { animation: float 4s ease-in-out infinite; }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            perspective: 1200px;
+            visibility: hidden;
+        }
+        
+        .loader-bar {
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .loader-progress {
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            background: #ff5fa2;
+        }
+
+        
+        .chat-bubble {
+            position: absolute;
+            padding: 8px 14px;
+            border-radius: 14px;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 60;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transform-style: preserve-3d;
+            
+            
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(20px);
+        }
+        
+        @media (min-width: 768px) {
+            .chat-bubble {
+                padding: 10px 18px;
+                font-size: 11px;
+                top: -60px;
+            }
+        }
+
+        .bubble-me {
+            background: #f43f5e;
+            color: white;
+        }
+        .bubble-jano {
+            background: #fff;
+            color: #000;
+        }
+    </style>
+</head>
+<body class="text-white selection:bg-rose-500/30">
+
+    <div id="intro-overlay">
+        <div id="intro-text" class="text-sm tracking-[0.8em] uppercase text-white/50 font-bold">WEEEEEEEEEEEEE</div>
+        <div class="loader-bar">
+            <div class="loader-progress" id="load-progress"></div>
+        </div>
+    </div>
+
+    <div class="noise"></div>
+    <div id="custom-cursor"></div>
+
+    <div class="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] bg-rose-600/10 blur-[120px] rounded-full"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pink-600/10 blur-[120px] rounded-full"></div>
+
+    <div class="wrapper relative z-10 p-6 md:p-12" id="main-wrapper">
+        
+        <div class="text-center mb-12 md:mb-20 opacity-0" id="header">
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <div class="h-[1px] w-8 md:w-12 bg-gradient-to-r from-transparent to-pink-500"></div>
+                <span class="uppercase tracking-[0.4em] text-pink-400 text-[10px] font-bold">MADE WITH HEART FOR HER</span>
+                <div class="h-[1px] w-8 md:w-12 bg-gradient-to-l from-transparent to-pink-500"></div>
+            </div>
+            <h1 class="text-5xl md:text-8xl font-black italic tracking-tighter mb-4 neon-text">
+                FALLING IN LOVE
+            </h1>
+            <p class="text-white/40 tracking-[0.5em] text-[10px] md:text-xs uppercase">With Jano since Feb 26, 2025</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-16 md:mb-24 w-full max-w-4xl" id="timer-container">
+            <div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col items-center opacity-0 translate-y-8" id="t1">
+                <span class="text-3xl md:text-6xl font-black tabular-nums" id="days">00</span>
+                <span class="text-[10px] uppercase tracking-widest text-pink-400 font-bold mt-2">Days</span>
+            </div>
+            <div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col items-center opacity-0 translate-y-8" id="t2">
+                <span class="text-3xl md:text-6xl font-black tabular-nums" id="hours">00</span>
+                <span class="text-[10px] uppercase tracking-widest text-pink-400 font-bold mt-2">Hours</span>
+            </div>
+            <div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col items-center opacity-0 translate-y-8" id="t3">
+                <span class="text-3xl md:text-6xl font-black tabular-nums" id="minutes">00</span>
+                <span class="text-[10px] uppercase tracking-widest text-pink-400 font-bold mt-2">Minutes</span>
+            </div>
+            <div class="glass-card rounded-3xl p-6 md:p-8 flex flex-col items-center opacity-0 translate-y-8" id="t4">
+                <span class="text-3xl md:text-6xl font-black tabular-nums text-rose-500" id="seconds">00</span>
+                <span class="text-[10px] uppercase tracking-widest text-white/40 font-bold mt-2">Seconds</span>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 w-full max-w-6xl px-4">
+            
+            
+            <div class="relative group">
+                
+                <div id="bubble-me" class="chat-bubble bubble-me">I love you!</div>
+                <div class="card-glow-bg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="glass-card rounded-[40px] p-8 md:p-12 w-[280px] md:w-[320px] text-center relative opacity-0 md:-translate-x-12" id="card-me">
+                    <div class="absolute top-6 right-8 text-6xl font-black italic text-white/5">SU</div>
+                    <div class="relative mx-auto w-32 h-32 md:w-40 md:h-40 mb-6 bg-white/5 rounded-full flex items-center justify-center overflow-hidden">
+                        <img id="avatar-me" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
+                             class="w-full h-full rounded-full border-2 border-pink-500/30 avatar-glow group-hover:scale-110 transition-transform duration-500 relative z-10 bg-black/40 opacity-0">
+                        <div id="loader-me" class="absolute inset-0 flex items-center justify-center text-[10px] tracking-widest uppercase text-white/20 pulse-loading">Loading</div>
+                    </div>
+                    <h3 id="name-me" class="text-2xl font-bold tracking-tight text-white/10 italic">...</h3>
+                    <p id="user-me" class="text-white/30 text-[10px] uppercase tracking-[0.3em] mt-2">@roblox_user</p>
+                </div>
+            </div>
+
+            <div class="floating opacity-0 py-4 md:py-0" id="heart-center">
+                <svg class="w-12 h-12 md:w-16 md:h-16 text-rose-600 fill-current drop-shadow-[0_0_20px_rgba(225,29,72,0.6)]" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+            </div>
+
+            
+            <div class="relative group">
+                
+                <div id="bubble-jano" class="chat-bubble bubble-jano">I love you more!</div>
+                <div class="card-glow-bg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="glass-card rounded-[40px] p-8 md:p-12 w-[280px] md:w-[320px] text-center relative opacity-0 md:translate-x-12" id="card-jano">
+                    <div class="absolute top-6 right-8 text-6xl font-black italic text-white/5">NO</div>
+                    <div class="relative mx-auto w-32 h-32 md:w-40 md:h-40 mb-6 bg-white/5 rounded-full flex items-center justify-center overflow-hidden">
+                        <img id="avatar-jano" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
+                             class="w-full h-full rounded-full border-2 border-rose-500/20 avatar-glow group-hover:scale-110 transition-transform duration-500 relative z-10 bg-black/40 opacity-0">
+                        <div id="loader-jano" class="absolute inset-0 flex items-center justify-center text-[10px] tracking-widest uppercase text-white/20 pulse-loading">Loading</div>
+                    </div>
+                    <h3 id="name-jano" class="text-2xl font-bold tracking-tight text-white/10 italic">...</h3>
+                    <p id="user-jano" class="text-rose-400/60 text-[10px] uppercase tracking-[0.3em] mt-2">@roblox_user</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-20 md:mt-32 text-center max-w-xl opacity-0" id="footer">
+            <p class="text-white/50 italic font-light leading-relaxed text-sm md:text-base">
+                "CANT YOU SEE THAT YOU'RE EVERYTHING I EVER WANTED?"
+            </p>
+            <div class="mt-8 flex justify-center gap-8 opacity-20 text-[10px] tracking-[0.5em] uppercase">
+                <span>Always</span>
+                <span>Mad At</span>
+                <span>Me :3</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        const conversation = [
+            { me: "I love you!", her: "I love you more!" },
+            { me: "Shut up!", her: "No YOU shut up!" },
+            { me: "Stop being cute.", her: "Make me! :P" },
+            { me: "You're my favorite.", her: "And you're mine. <3" },
+            { me: "Please? ;3", her: "No shutup." },
+            { me: "BLA BLA BLA", her: "WTF?" }
+        ];
+        let currentConv = 0;
+
+        function cycleMessages() {
+            const meBubble = document.getElementById('bubble-me');
+            const janoBubble = document.getElementById('bubble-jano');
+            const data = conversation[currentConv];
+
+            
+            gsap.to([meBubble, janoBubble], { 
+                opacity: 0, 
+                scale: 0.8, 
+                y: 10,
+                duration: 0.4, 
+                onComplete: () => {
+                    meBubble.innerText = data.me;
+                    janoBubble.innerText = data.her;
+                    
+                    
+                    gsap.fromTo(meBubble, 
+                        { opacity: 0, scale: 0.5, y: 20 },
+                        { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(2)" }
+                    );
+                    gsap.fromTo(janoBubble, 
+                        { opacity: 0, scale: 0.5, y: 20 },
+                        { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(2)", delay: 0.4 }
+                    );
+                }
+            });
+
+            currentConv = (currentConv + 1) % conversation.length;
+        }
+
+        // --- Roblox Config ---
+        const ROBLOX_USERS = [
+            { id: "3068565202", username: "omk8sus", prefix: "me" },
+            { id: "7070775606", username: "jana20_0666", prefix: "jano" }
+        ];
+
+        async function fetchWithProxy(url, options = {}) {
+            const proxy = 'https://api.allorigins.win/raw?url=';
+            return fetch(proxy + encodeURIComponent(url), options);
+        }
+
+        async function fetchRobloxData() {
+            const userIds = ROBLOX_USERS.map(u => u.id).join(',');
+            try {
+                const thumbUrl = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userIds}&size=420x420&format=Png&isCircular=false`;
+                const thumbRes = await fetchWithProxy(thumbUrl);
+                const thumbData = await thumbRes.json();
+
+                for (const userConfig of ROBLOX_USERS) {
+                    try {
+                        const profileUrl = `https://users.roblox.com/v1/users/${userConfig.id}`;
+                        const profileRes = await fetchWithProxy(profileUrl);
+                        const profile = await profileRes.json();
+                        if (profile && profile.displayName) {
+                            const nameEl = document.getElementById(`name-${userConfig.prefix}`);
+                            nameEl.innerText = profile.displayName;
+                            nameEl.classList.remove('text-white/10', 'italic');
+                            document.getElementById(`user-${userConfig.prefix}`).innerText = `@${profile.name}`;
+                        }
+                    } catch (e) { console.warn(e); }
+                }
+
+                if (thumbData && thumbData.data) {
+                    ROBLOX_USERS.forEach(config => {
+                        const thumb = thumbData.data.find(t => t.targetId.toString() === config.id);
+                        if (thumb && thumb.imageUrl) {
+                            const img = document.getElementById(`avatar-${config.prefix}`);
+                            const loader = document.getElementById(`loader-${config.prefix}`);
+                            img.src = thumb.imageUrl;
+                            img.onload = () => {
+                                gsap.to(img, { opacity: 1, duration: 0.5 });
+                                if(loader) loader.style.display = 'none';
+                            };
+                        }
+                    });
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        fetchRobloxData();
+
+       
+        const startDate = new Date("2025-02-26T00:00:00").getTime();
+        function updateTimer() {
+            const now = new Date().getTime();
+            const diff = now - startDate;
+            if (diff < 0) return;
+            document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+            document.getElementById('hours').innerText = Math.floor((diff / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
+        }
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        
+        const cursor = document.getElementById('custom-cursor');
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.15, ease: "power2.out" });
+        });
+
+        
+        const startApp = () => {
+            document.body.style.overflow = 'auto';
+            document.getElementById('main-wrapper').style.visibility = 'visible';
+            
+            const tl = gsap.timeline();
+            tl.to("#intro-overlay", { opacity: 0, duration: 1, ease: "power2.inOut", onComplete: () => {
+                document.getElementById('intro-overlay').style.display = 'none';
+                cycleMessages();
+                setInterval(cycleMessages, 5000);
+            }})
+            .to("#header", { opacity: 1, y: 0, duration: 1.5, ease: "expo.out" }, "-=0.2")
+            .to(["#t1", "#t2", "#t3", "#t4"], { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "back.out(1.7)" }, "-=1")
+            .to("#card-me", { opacity: 1, x: 0, duration: 1.2, ease: "power4.out" }, "-=0.5")
+            .to("#card-jano", { opacity: 1, x: 0, duration: 1.2, ease: "power4.out" }, "-=1.1")
+            .to("#heart-center", { opacity: 1, scale: 1, duration: 1, ease: "elastic.out(1, 0.3)" }, "-=0.8")
+            .to("#footer", { opacity: 1, duration: 2 }, "-=0.5");
+        }
+
+        gsap.to("#load-progress", {
+            width: "100%",
+            duration: 1.2,
+            ease: "power1.inOut",
+            onComplete: startApp
+        });
+
+        
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const dx = e.clientX - rect.left - rect.width / 2;
+                const dy = e.clientY - rect.top - rect.height / 2;
+                gsap.to(card, { 
+                    rotationY: dx / 12, 
+                    rotationX: -dy / 12, 
+                    transformPerspective: 1000, 
+                    ease: "power2.out", 
+                    duration: 0.4 
+                });
+            });
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, { rotationY: 0, rotationX: 0, duration: 1, ease: "elastic.out(1, 0.3)" });
+            });
+        });
+    </script>
+</body>
+</html>
