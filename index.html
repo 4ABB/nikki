@@ -6,16 +6,17 @@
     <title>Falling In Love | nikki & ARCH </title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
         
         body {
             background-color: #030303;
             font-family: 'Inter', sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
             cursor: none;
+            -webkit-font-smoothing: antialiased;
         }
 
         #intro-overlay {
@@ -29,21 +30,22 @@
             flex-direction: column;
         }
 
-        
         .card-glow-bg {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 105%;
-            height: 105%;
-            transform: translate(-50%, -50%);
+            width: 110%;
+            height: 110%;
+            /* FIX: Push the glow further back in 3D space to prevent clipping/glitching */
+            transform: translate3d(-50%, -50%, -50px);
             background: linear-gradient(45deg, transparent, rgba(244, 63, 94, 0.4), transparent, rgba(255, 95, 162, 0.4), transparent);
             background-size: 200% 200%;
-            border-radius: 46px;
+            border-radius: 60px;
             z-index: -1;
-            filter: blur(15px);
-            animation: moveGradient 3s linear infinite;
+            filter: blur(40px);
+            animation: moveGradient 4s linear infinite;
             pointer-events: none;
+            opacity: 0.8;
         }
 
         @keyframes moveGradient {
@@ -53,66 +55,68 @@
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: border 0.3s ease, box-shadow 0.3s ease;
             z-index: 10;
             position: relative;
-            
+            /* FIX: Anti-aliasing tricks for smooth edges */
+            outline: 1px solid transparent; 
             backface-visibility: hidden;
             transform-style: preserve-3d;
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         .glass-card:hover {
             border: 1px solid rgba(255, 95, 162, 0.4);
-            box-shadow: 0 0 50px rgba(255, 95, 162, 0.15);
+            box-shadow: 0 0 60px rgba(255, 95, 162, 0.1);
         }
 
         .neon-text {
-            text-shadow: 0 0 20px rgba(244, 63, 94, 0.5);
+            text-shadow: 0 0 25px rgba(244, 63, 94, 0.6);
         }
 
         .noise {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.1;
+            opacity: 0.04;
             pointer-events: none;
-            z-index: 50;
+            z-index: 1; 
         }
 
         #custom-cursor {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(255, 95, 162, 0.1) 0%, rgba(244, 63, 94, 0.05) 30%, transparent 70%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 95, 162, 0.12) 0%, transparent 70%);
             position: fixed;
             pointer-events: none;
-            z-index: 0;
+            z-index: 2;
             transform: translate(-50%, -50%);
             will-change: transform;
         }
 
         .avatar-glow {
-            box-shadow: 0 0 30px rgba(255, 95, 162, 0.2);
+            box-shadow: 0 0 35px rgba(255, 95, 162, 0.25);
         }
 
         .pulse-loading {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.4; }
         }
 
         @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
         }
-        .floating { animation: float 4s ease-in-out infinite; }
+        .floating { animation: float 5s ease-in-out infinite; }
 
         .wrapper {
             display: flex;
@@ -121,8 +125,10 @@
             justify-content: center;
             min-height: 100vh;
             width: 100%;
-            perspective: 1200px;
+            perspective: 2000px; /* Increased perspective for stability */
             visibility: hidden;
+            position: relative;
+            z-index: 10;
         }
         
         .loader-bar {
@@ -140,50 +146,33 @@
             background: #ff5fa2;
         }
 
-        
         .chat-bubble {
             position: absolute;
-            padding: 8px 14px;
-            border-radius: 14px;
-            font-size: 10px;
-            font-weight: 800;
+            padding: 10px 16px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 900;
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
-            z-index: 60;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 100;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            transform-style: preserve-3d;
-            
-            
-            top: -45px;
+            letter-spacing: 0.12em;
+            top: -65px;
             left: 50%;
-            transform: translateX(-50%) translateZ(20px);
-        }
-        
-        @media (min-width: 768px) {
-            .chat-bubble {
-                padding: 10px 18px;
-                font-size: 11px;
-                top: -60px;
-            }
+            /* Push bubble forward to definitely clear the card */
+            transform: translateX(-50%) translateZ(80px);
         }
 
-        .bubble-me {
-            background: #f43f5e;
-            color: white;
-        }
-        .bubble-nikki {
-            background: #fff;
-            color: #000;
-        }
+        .bubble-me { background: #f43f5e; color: white; }
+        .bubble-nikki { background: #fff; color: #000; }
     </style>
 </head>
 <body class="text-white selection:bg-rose-500/30">
 
     <div id="intro-overlay">
-        <div id="intro-text" class="text-sm tracking-[0.8em] uppercase text-white/50 font-bold">Just... Wait...</div>
+        <div class="text-sm tracking-[0.8em] uppercase text-white/50 font-bold">Just... Wait...</div>
         <div class="loader-bar">
             <div class="loader-progress" id="load-progress"></div>
         </div>
@@ -192,21 +181,22 @@
     <div class="noise"></div>
     <div id="custom-cursor"></div>
 
-    <div class="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] bg-rose-600/10 blur-[120px] rounded-full"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pink-600/10 blur-[120px] rounded-full"></div>
+    <!-- Ambient background glows -->
+    <div class="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] bg-rose-600/5 blur-[140px] rounded-full pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pink-600/5 blur-[140px] rounded-full pointer-events-none"></div>
 
-    <div class="wrapper relative z-10 p-6 md:p-12" id="main-wrapper">
+    <div class="wrapper p-6 md:p-12" id="main-wrapper">
         
         <div class="text-center mb-12 md:mb-20 opacity-0" id="header">
             <div class="flex items-center justify-center gap-4 mb-6">
-                <div class="h-[1px] w-8 md:w-12 bg-gradient-to-r from-transparent to-pink-500"></div>
-                <span class="uppercase tracking-[0.4em] text-pink-400 text-[10px] font-bold">MADE WITH HEART FOR HER</span>
-                <div class="h-[1px] w-8 md:w-12 bg-gradient-to-l from-transparent to-pink-500"></div>
+                <div class="h-[1px] w-8 md:w-12 bg-gradient-to-r from-transparent to-pink-500/50"></div>
+                <span class="uppercase tracking-[0.4em] text-pink-400/80 text-[10px] font-bold">ETERNAL CHAPTER</span>
+                <div class="h-[1px] w-8 md:w-12 bg-gradient-to-l from-transparent to-pink-500/50"></div>
             </div>
             <h1 class="text-5xl md:text-8xl font-black italic tracking-tighter mb-4 neon-text">
                 FALLING IN LOVE
             </h1>
-            <p class="text-white/40 tracking-[0.5em] text-[10px] md:text-xs uppercase">With Nikki since Jan 15, 2026</p>
+            <p class="text-white/40 tracking-[0.6em] text-[10px] md:text-xs uppercase">Since January 15, 2026</p>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 mb-16 md:mb-24 w-full max-w-4xl" id="timer-container">
@@ -228,54 +218,53 @@
             </div>
         </div>
 
-        <div class="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16 w-full max-w-6xl px-4">
+        <div class="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 w-full max-w-6xl px-4">
             
-            
+            <!-- My Card -->
             <div class="relative group">
-                
                 <div id="bubble-me" class="chat-bubble bubble-me">I love you!</div>
-                <div class="card-glow-bg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="glass-card rounded-[40px] p-8 md:p-12 w-[280px] md:w-[320px] text-center relative opacity-0 md:-translate-x-12" id="card-me">
-                    <div class="absolute top-6 right-8 text-6xl font-black italic text-white/5">01</div>
-                    <div class="relative mx-auto w-32 h-32 md:w-40 md:h-40 mb-6 bg-white/5 rounded-full flex items-center justify-center overflow-hidden">
+                <div class="card-glow-bg opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                <div class="glass-card rounded-[45px] p-8 md:p-12 w-[290px] md:w-[340px] text-center opacity-0" id="card-me">
+                    <div class="absolute top-8 right-10 text-7xl font-black italic text-white/[0.03]">01</div>
+                    <div class="relative mx-auto w-36 h-36 md:w-44 md:h-44 mb-8 bg-white/5 rounded-full flex items-center justify-center overflow-hidden">
                         <img id="avatar-me" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
-                             class="w-full h-full rounded-full border-2 border-pink-500/30 avatar-glow group-hover:scale-110 transition-transform duration-500 relative z-10 bg-black/40 opacity-0">
-                        <div id="loader-me" class="absolute inset-0 flex items-center justify-center text-[10px] tracking-widest uppercase text-white/20 pulse-loading">Loading</div>
+                             class="w-full h-full rounded-full border-2 border-pink-500/20 avatar-glow group-hover:scale-110 transition-transform duration-700 relative z-10 bg-black/40 opacity-0 object-cover">
+                        <div id="loader-me" class="absolute inset-0 flex items-center justify-center text-[10px] tracking-widest uppercase text-white/10 pulse-loading">Loading</div>
                     </div>
-                    <h3 id="name-me" class="text-2xl font-bold tracking-tight text-white/10 italic">...</h3>
-                    <p id="user-me" class="text-white/30 text-[10px] uppercase tracking-[0.3em] mt-2">@roblox_user</p>
+                    <h3 id="name-me" class="text-3xl font-bold tracking-tight text-white/10 italic">...</h3>
+                    <p id="user-me" class="text-white/20 text-[10px] uppercase tracking-[0.4em] mt-3">@roblox_user</p>
                 </div>
             </div>
 
-            <div class="floating opacity-0 py-4 md:py-0" id="heart-center">
-                <svg class="w-12 h-12 md:w-16 md:h-16 text-rose-600 fill-current drop-shadow-[0_0_20px_rgba(225,29,72,0.6)]" viewBox="0 0 24 24">
+            <!-- Floating Heart -->
+            <div class="floating opacity-0 py-6 md:py-0" id="heart-center">
+                <svg class="w-14 h-14 md:w-20 md:h-20 text-rose-600 fill-current drop-shadow-[0_0_30px_rgba(225,29,72,0.5)]" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
             </div>
 
-            
+            <!-- Her Card -->
             <div class="relative group">
-                
                 <div id="bubble-nikki" class="chat-bubble bubble-nikki">I love you more!</div>
-                <div class="card-glow-bg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="glass-card rounded-[40px] p-8 md:p-12 w-[280px] md:w-[320px] text-center relative opacity-0 md:translate-x-12" id="card-nikki">
-                    <div class="absolute top-6 right-8 text-6xl font-black italic text-white/5">30</div>
-                    <div class="relative mx-auto w-32 h-32 md:w-40 md:h-40 mb-6 bg-white/5 rounded-full flex items-center justify-center overflow-hidden">
+                <div class="card-glow-bg opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                <div class="glass-card rounded-[45px] p-8 md:p-12 w-[290px] md:w-[340px] text-center opacity-0" id="card-nikki">
+                    <div class="absolute top-8 right-10 text-7xl font-black italic text-white/[0.03]">30</div>
+                    <div class="relative mx-auto w-36 h-36 md:w-44 md:h-44 mb-8 bg-white/5 rounded-full flex items-center justify-center overflow-hidden">
                         <img id="avatar-nikki" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
-                             class="w-full h-full rounded-full border-2 border-rose-500/20 avatar-glow group-hover:scale-110 transition-transform duration-500 relative z-10 bg-black/40 opacity-0">
-                        <div id="loader-nikki" class="absolute inset-0 flex items-center justify-center text-[10px] tracking-widest uppercase text-white/20 pulse-loading">Loading</div>
+                             class="w-full h-full rounded-full border-2 border-rose-500/20 avatar-glow group-hover:scale-110 transition-transform duration-700 relative z-10 bg-black/40 opacity-0 object-cover">
+                        <div id="loader-nikki" class="absolute inset-0 flex items-center justify-center text-[10px] tracking-widest uppercase text-white/10 pulse-loading">Loading</div>
                     </div>
-                    <h3 id="name-nikki" class="text-2xl font-bold tracking-tight text-white/10 italic">...</h3>
-                    <p id="user-nikki" class="text-rose-400/60 text-[10px] uppercase tracking-[0.3em] mt-2">@roblox_user</p>
+                    <h3 id="name-nikki" class="text-3xl font-bold tracking-tight text-white/10 italic">...</h3>
+                    <p id="user-nikki" class="text-rose-400/50 text-[10px] uppercase tracking-[0.4em] mt-3">@roblox_user</p>
                 </div>
             </div>
         </div>
 
         <div class="mt-20 md:mt-32 text-center max-w-xl opacity-0" id="footer">
-            <p class="text-white/50 italic font-light leading-relaxed text-sm md:text-base">
+            <p class="text-white/40 italic font-light leading-relaxed text-sm md:text-base px-6">
                 "You've earned the key to my heart. You're the one."
             </p>
-            <div class="mt-8 flex justify-center gap-8 opacity-20 text-[10px] tracking-[0.5em] uppercase">
+            <div class="mt-10 flex justify-center gap-10 opacity-20 text-[10px] tracking-[0.5em] uppercase font-bold">
                 <span>Always</span>
                 <span>Hating on</span>
                 <span>Me ^^</span>
@@ -300,92 +289,96 @@
             const nikkiBubble = document.getElementById('bubble-nikki');
             const data = conversation[currentConv];
 
-            
             gsap.to([meBubble, nikkiBubble], { 
                 opacity: 0, 
                 scale: 0.8, 
-                y: 10,
+                z: 0,
                 duration: 0.4, 
                 onComplete: () => {
                     meBubble.innerText = data.me;
                     nikkiBubble.innerText = data.her;
                     
-                    
                     gsap.fromTo(meBubble, 
-                        { opacity: 0, scale: 0.5, y: 20 },
-                        { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(2)" }
+                        { opacity: 0, scale: 0.5, z: 20 },
+                        { opacity: 1, scale: 1, z: 80, duration: 0.6, ease: "back.out(2)" }
                     );
                     gsap.fromTo(nikkiBubble, 
-                        { opacity: 0, scale: 0.5, y: 20 },
-                        { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(2)", delay: 0.4 }
+                        { opacity: 0, scale: 0.5, z: 20 },
+                        { opacity: 1, scale: 1, z: 80, duration: 0.6, ease: "back.out(2)", delay: 0.4 }
                     );
                 }
             });
-
             currentConv = (currentConv + 1) % conversation.length;
         }
 
-        // --- Roblox ids ---
+        // --- Roblox Config ---
         const ROBLOX_USERS = [
             { id: "3959615538", username: "Hyoudou_Issei76", prefix: "me" },
-            { id: "7119753277", username: "pqwzsie", prefix: "NIKKI" }
+            { id: "7119753277", username: "pqwzsie", prefix: "nikki" } 
         ];
-
-        async function fetchWithProxy(url, options = {}) {
-            const proxy = 'https://api.allorigins.win/raw?url=';
-            return fetch(proxy + encodeURIComponent(url), options);
-        }
 
         async function fetchRobloxData() {
             const userIds = ROBLOX_USERS.map(u => u.id).join(',');
             try {
                 const thumbUrl = `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userIds}&size=420x420&format=Png&isCircular=false`;
-                const thumbRes = await fetchWithProxy(thumbUrl);
-                const thumbData = await thumbRes.json();
+                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(thumbUrl);
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
 
-                for (const userConfig of ROBLOX_USERS) {
-                    try {
-                        const profileUrl = `https://users.roblox.com/v1/users/${userConfig.id}`;
-                        const profileRes = await fetchWithProxy(profileUrl);
-                        const profile = await profileRes.json();
-                        if (profile && profile.displayName) {
-                            const nameEl = document.getElementById(`name-${userConfig.prefix}`);
-                            nameEl.innerText = profile.displayName;
-                            nameEl.classList.remove('text-white/10', 'italic');
-                            document.getElementById(`user-${userConfig.prefix}`).innerText = `@${profile.name}`;
-                        }
-                    } catch (e) { console.warn(e); }
-                }
-
-                if (thumbData && thumbData.data) {
+                if (data && data.data) {
                     ROBLOX_USERS.forEach(config => {
-                        const thumb = thumbData.data.find(t => t.targetId.toString() === config.id);
-                        if (thumb && thumb.imageUrl) {
-                            const img = document.getElementById(`avatar-${config.prefix}`);
-                            const loader = document.getElementById(`loader-${config.prefix}`);
-                            img.src = thumb.imageUrl;
+                        const thumbData = data.data.find(t => t.targetId.toString() === config.id);
+                        const img = document.getElementById(`avatar-${config.prefix}`);
+                        const loader = document.getElementById(`loader-${config.prefix}`);
+                        if (thumbData && thumbData.imageUrl && img) {
+                            img.src = thumbData.imageUrl;
                             img.onload = () => {
-                                gsap.to(img, { opacity: 1, duration: 0.5 });
+                                gsap.to(img, { opacity: 1, duration: 0.8 });
                                 if(loader) loader.style.display = 'none';
                             };
                         }
                     });
                 }
-            } catch (err) { console.error(err); }
+            } catch (error) { console.error("Avatar error", error); }
+
+            for (const userConfig of ROBLOX_USERS) {
+                try {
+                    const profileUrl = `https://users.roblox.com/v1/users/${userConfig.id}`;
+                    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(profileUrl);
+                    const res = await fetch(proxyUrl);
+                    const profile = await res.json();
+                    if (profile && profile.displayName) {
+                        const nameEl = document.getElementById(`name-${userConfig.prefix}`);
+                        const userEl = document.getElementById(`user-${userConfig.prefix}`);
+                        if (nameEl) {
+                            nameEl.innerText = profile.displayName;
+                            nameEl.classList.remove('text-white/10', 'italic');
+                        }
+                        if (userEl) userEl.innerText = `@${profile.name}`;
+                    }
+                } catch (e) {
+                    const nameEl = document.getElementById(`name-${userConfig.prefix}`);
+                    if(nameEl) nameEl.innerText = userConfig.username;
+                }
+            }
         }
 
         fetchRobloxData();
 
-       
+        
         const startDate = new Date("2026-01-15T00:00:00").getTime();
         function updateTimer() {
             const now = new Date().getTime();
             const diff = now - startDate;
             if (diff < 0) return;
-            document.getElementById('days').innerText = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-            document.getElementById('hours').innerText = Math.floor((diff / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
-            document.getElementById('minutes').innerText = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
-            document.getElementById('seconds').innerText = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / 1000 / 60) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+            document.getElementById('days').innerText = d.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
         }
         setInterval(updateTimer, 1000);
         updateTimer();
@@ -393,34 +386,27 @@
         
         const cursor = document.getElementById('custom-cursor');
         document.addEventListener('mousemove', (e) => {
-            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.15, ease: "power2.out" });
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.2, ease: "power2.out" });
         });
 
-        
         const startApp = () => {
             document.body.style.overflow = 'auto';
             document.getElementById('main-wrapper').style.visibility = 'visible';
-            
             const tl = gsap.timeline();
             tl.to("#intro-overlay", { opacity: 0, duration: 1, ease: "power2.inOut", onComplete: () => {
                 document.getElementById('intro-overlay').style.display = 'none';
                 cycleMessages();
-                setInterval(cycleMessages, 5000);
+                setInterval(cycleMessages, 5500);
             }})
             .to("#header", { opacity: 1, y: 0, duration: 1.5, ease: "expo.out" }, "-=0.2")
             .to(["#t1", "#t2", "#t3", "#t4"], { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "back.out(1.7)" }, "-=1")
-            .to("#card-me", { opacity: 1, x: 0, duration: 1.2, ease: "power4.out" }, "-=0.5")
-            .to("#card-nikki", { opacity: 1, x: 0, duration: 1.2, ease: "power4.out" }, "-=1.1")
-            .to("#heart-center", { opacity: 1, scale: 1, duration: 1, ease: "elastic.out(1, 0.3)" }, "-=0.8")
+            .to("#card-me", { opacity: 1, x: 0, duration: 1.5, ease: "power4.out" }, "-=0.6")
+            .to("#card-nikki", { opacity: 1, x: 0, duration: 1.5, ease: "power4.out" }, "-=1.4")
+            .to("#heart-center", { opacity: 1, scale: 1, duration: 1, ease: "elastic.out(1, 0.3)" }, "-=1")
             .to("#footer", { opacity: 1, duration: 2 }, "-=0.5");
         }
 
-        gsap.to("#load-progress", {
-            width: "100%",
-            duration: 1.2,
-            ease: "power1.inOut",
-            onComplete: startApp
-        });
+        gsap.to("#load-progress", { width: "100%", duration: 1.5, ease: "power2.inOut", onComplete: startApp });
 
         
         document.querySelectorAll('.glass-card').forEach(card => {
@@ -428,16 +414,17 @@
                 const rect = card.getBoundingClientRect();
                 const dx = e.clientX - rect.left - rect.width / 2;
                 const dy = e.clientY - rect.top - rect.height / 2;
+                
                 gsap.to(card, { 
-                    rotationY: dx / 12, 
-                    rotationX: -dy / 12, 
-                    transformPerspective: 1000, 
-                    ease: "power2.out", 
-                    duration: 0.4 
+                    rotationY: dx / 25, 
+                    rotationX: -dy / 25, 
+                    transformPerspective: 2000, 
+                    ease: "power3.out", 
+                    duration: 0.5 
                 });
             });
             card.addEventListener('mouseleave', () => {
-                gsap.to(card, { rotationY: 0, rotationX: 0, duration: 1, ease: "elastic.out(1, 0.3)" });
+                gsap.to(card, { rotationY: 0, rotationX: 0, duration: 1.2, ease: "elastic.out(1, 0.4)" });
             });
         });
     </script>
