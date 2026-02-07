@@ -36,7 +36,6 @@
             left: 50%;
             width: 110%;
             height: 110%;
-            /* FIX: Push the glow further back in 3D space to prevent clipping/glitching */
             transform: translate3d(-50%, -50%, -50px);
             background: linear-gradient(45deg, transparent, rgba(244, 63, 94, 0.4), transparent, rgba(255, 95, 162, 0.4), transparent);
             background-size: 200% 200%;
@@ -62,7 +61,7 @@
             transition: border 0.3s ease, box-shadow 0.3s ease;
             z-index: 10;
             position: relative;
-            /* FIX: Anti-aliasing tricks for smooth edges */
+            
             outline: 1px solid transparent; 
             backface-visibility: hidden;
             transform-style: preserve-3d;
@@ -125,7 +124,7 @@
             justify-content: center;
             min-height: 100vh;
             width: 100%;
-            perspective: 2000px; /* Increased perspective for stability */
+            perspective: 2000px; 
             visibility: hidden;
             position: relative;
             z-index: 10;
@@ -161,7 +160,7 @@
             letter-spacing: 0.12em;
             top: -65px;
             left: 50%;
-            /* Push bubble forward to definitely clear the card */
+            
             transform: translateX(-50%) translateZ(80px);
         }
 
@@ -181,7 +180,7 @@
     <div class="noise"></div>
     <div id="custom-cursor"></div>
 
-    <!-- Ambient background glows -->
+    
     <div class="fixed top-[-10%] left-[-10%] w-[60%] h-[60%] bg-rose-600/5 blur-[140px] rounded-full pointer-events-none"></div>
     <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pink-600/5 blur-[140px] rounded-full pointer-events-none"></div>
 
@@ -220,7 +219,7 @@
 
         <div class="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 w-full max-w-6xl px-4">
             
-            <!-- My Card -->
+            
             <div class="relative group">
                 <div id="bubble-me" class="chat-bubble bubble-me">I love you!</div>
                 <div class="card-glow-bg opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
@@ -236,14 +235,14 @@
                 </div>
             </div>
 
-            <!-- Floating Heart -->
+            
             <div class="floating opacity-0 py-6 md:py-0" id="heart-center">
                 <svg class="w-14 h-14 md:w-20 md:h-20 text-rose-600 fill-current drop-shadow-[0_0_30px_rgba(225,29,72,0.5)]" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                 </svg>
             </div>
 
-            <!-- Her Card -->
+            
             <div class="relative group">
                 <div id="bubble-nikki" class="chat-bubble bubble-nikki">I love you more!</div>
                 <div class="card-glow-bg opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
@@ -430,3 +429,4 @@
     </script>
 </body>
 </html>
+
