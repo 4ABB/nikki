@@ -1,1 +1,426 @@
-website is updating please wait
+still updating by the way <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falling In Love | Nikki & Arch</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Playfair+Display:ital,wght@1,400;1,700;1,900&display=swap');
+        
+        :root {
+            --primary: #f43f5e;
+            --accent: #a855f7;
+            --bg: #050505;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            cursor: none;
+            margin: 0; padding: 0;
+            color: white;
+        }
+
+        /* The Font for Names and Headings */
+        .font-serif-display { 
+            font-family: 'Playfair Display', serif; 
+            font-style: italic;
+        }
+        
+        .font-inter { font-family: 'Inter', sans-serif; }
+
+        /* Background Visuals */
+        .bg-visuals { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .mesh-gradient {
+            position: absolute; width: 150vw; height: 150vh; top: -25vh; left: -25vw;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(244, 63, 94, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 90%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            filter: blur(80px);
+            animation: meshRotate 30s linear infinite;
+        }
+        @keyframes meshRotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Custom Cursor */
+        #custom-cursor {
+            position: fixed; top: 0; left: 0; width: 10px; height: 10px;
+            background: #fff; border-radius: 50%;
+            pointer-events: none; z-index: 9999; mix-blend-mode: difference;
+        }
+
+        /* Glass Styling */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 32px;
+        }
+
+        /* Screens Management */
+        .screen {
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; z-index: 10;
+        }
+        .screen.active { opacity: 1; visibility: visible; }
+
+        .avatar-roblox {
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #111;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .neon-text {
+            text-shadow: 0 0 30px rgba(244, 63, 94, 0.3);
+            background: linear-gradient(to bottom, #fff, #ffcce0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #next-btn {
+            position: fixed; bottom: 6vh; left: 50%; transform: translateX(-50%);
+            z-index: 100; padding: 14px 40px; border-radius: 99px;
+            background: #fff; color: #000; font-weight: 800;
+            letter-spacing: 0.15em; cursor: none; display: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            font-size: 11px;
+        }
+
+        /* Final Website Container */
+        #final-website {
+            position: fixed; inset: 0; z-index: 200; background: var(--bg);
+            display: none; overflow-y: auto; overflow-x: hidden;
+        }
+
+        .bar { width: 2px; background: #fff; border-radius: 1px; animation: equalize 0.8s infinite alternate; }
+        @keyframes equalize { 0% { height: 4px; opacity: 0.3; } 100% { height: 16px; opacity: 1; } }
+
+        /* Smooth List Animation */
+        .list-item { opacity: 0; transform: translateY(10px); }
+    </style>
+</head>
+<body>
+
+<div id="custom-cursor"></div>
+<div class="bg-visuals"><div class="mesh-gradient"></div></div>
+
+<!-- 0. LOADER -->
+<div id="loader-overlay" class="fixed inset-0 bg-black z-[999] flex flex-col items-center justify-center">
+    <div class="text-[9px] tracking-[1em] uppercase text-white/30 font-black mb-8 animate-pulse font-inter">Initializing Memory</div>
+    <div class="w-40 h-[1px] bg-white/5 relative overflow-hidden">
+        <div id="load-progress" class="absolute inset-y-0 left-0 bg-rose-600 w-0"></div>
+    </div>
+</div>
+
+<!-- 1. INTRO (Hidden until Loader completes) -->
+<div id="screen-intro" class="screen">
+    <div class="text-center">
+        <h2 class="uppercase tracking-[0.5em] text-[10px] text-white/30 mb-10 font-black font-inter">Experience the Journey</h2>
+        <button id="enter-btn" class="glass-card px-14 py-6 hover:bg-white/5 transition-all font-black tracking-[0.3em] text-[10px] uppercase font-inter border-white/10">Enter Journey</button>
+    </div>
+</div>
+
+<!-- 2. NIKKI'S LIST -->
+<div id="screen-nikki" class="screen">
+    <div class="flex flex-col md:flex-row items-center gap-20 max-w-6xl px-10">
+        <div class="text-center">
+            <img id="pfp-nikki" src="" class="avatar-roblox mb-8" onerror="this.src='https://ui-avatars.com/api/?name=N&background=f43f5e&color=fff'">
+            <h3 id="name-nikki" class="text-4xl font-serif-display">Nikki</h3>
+            <p id="user-nikki" class="text-rose-500/40 text-[9px] tracking-[0.3em] mt-3 uppercase font-black font-inter">@pqwzsie</p>
+        </div>
+        <div class="glass-card p-12 md:p-16 max-w-2xl">
+            <h2 class="font-serif-display text-4xl text-rose-300 mb-10">10 things Arch loves in you</h2>
+            <ol class="space-y-4 text-white/60 font-medium text-lg font-serif-display">
+                <li class="list-item">1. Your contagious laughter that brightens every room</li>
+                <li class="list-item">2. The way your eyes sparkle when you're excited</li>
+                <li class="list-item">3. Your incredible kindness towards everyone</li>
+                <li class="list-item">4. The strength you show in difficult moments</li>
+                <li class="list-item">5. Your unique sense of style and grace</li>
+                <li class="list-item">6. The peaceful feeling of being by your side</li>
+                <li class="list-item">7. Your passion for the things you love</li>
+                <li class="list-item">8. The way you understand me without words</li>
+                <li class="list-item">9. Your intelligence and witty humor</li>
+                <li class="list-item">10. Your unconditional support and love</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<!-- 3. ARCH'S QUESTION -->
+<div id="screen-arch" class="screen">
+    <div class="flex flex-col md:flex-row items-center gap-20 max-w-6xl px-10">
+        <div class="text-center">
+            <img id="pfp-arch" src="" class="avatar-roblox mb-8" onerror="this.src='https://ui-avatars.com/api/?name=A&background=000&color=fff'">
+            <h3 id="name-arch" class="text-4xl font-serif-display">Arch</h3>
+            <p id="user-arch" class="text-rose-500/40 text-[9px] tracking-[0.3em] mt-3 uppercase font-black font-inter">@Hyoudou_Issei76</p>
+        </div>
+        <div class="glass-card p-12 w-full max-w-xl">
+            <h2 class="font-serif-display text-4xl text-rose-300 mb-8">What is the 10 things you love in Arch?</h2>
+            <textarea id="love-input" class="w-full bg-black/40 border border-white/5 rounded-3xl p-8 text-white outline-none focus:border-rose-500/30 h-56 resize-none transition-all text-xl font-serif-display" placeholder="Speak from your heart..."></textarea>
+        </div>
+    </div>
+</div>
+
+<!-- 4. TIMER SCREEN -->
+<div id="screen-timer" class="screen">
+    <div class="text-center px-10">
+        <h2 class="font-serif-display text-5xl md:text-8xl mb-16">How long we've been together</h2>
+        <div id="experience-timer" class="flex flex-wrap gap-4 md:gap-12 justify-center font-inter"></div>
+    </div>
+</div>
+
+<!-- 5. FINAL WEBSITE (The "index.html" layout) -->
+<div id="final-website">
+    <div class="mesh-gradient"></div>
+    <div class="relative z-10 min-h-screen flex flex-col items-center py-24 px-10">
+        <div class="text-center mb-20">
+            <div class="flex items-center justify-center gap-8 mb-8 opacity-30">
+                <div class="h-[1px] w-16 bg-white"></div>
+                <span class="uppercase tracking-[0.6em] text-[10px] font-black font-inter">EST. JANUARY 15, 2026</span>
+                <div class="h-[1px] w-16 bg-white"></div>
+            </div>
+            <h1 class="text-8xl md:text-[11rem] font-serif-display tracking-tighter neon-text leading-[0.9] mb-4">FALLING<br/>IN LOVE</h1>
+        </div>
+
+        <!-- Timer Grid from Index -->
+        <div id="final-timer-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-5xl mb-32 font-inter"></div>
+
+        <!-- Duo Layout -->
+        <div class="flex flex-col md:flex-row gap-32 items-center mb-32">
+            <div class="text-center">
+                <img id="f-pfp-nikki" src="" class="avatar-roblox scale-125 mb-6 ring-1 ring-white/10" onerror="this.src='https://ui-avatars.com/api/?name=N&background=f43f5e&color=fff'">
+                <h4 class="font-serif-display text-2xl mt-6">Nikki</h4>
+            </div>
+            <div class="relative">
+                <div class="absolute inset-0 bg-rose-500 blur-3xl opacity-20 animate-pulse scale-150"></div>
+                <i class="fa-solid fa-heart text-rose-600 text-5xl relative z-10 drop-shadow-[0_0_15px_rgba(244,63,94,0.5)]"></i>
+            </div>
+            <div class="text-center">
+                <img id="f-pfp-arch" src="" class="avatar-roblox scale-125 mb-6 ring-1 ring-white/10" onerror="this.src='https://ui-avatars.com/api/?name=A&background=000&color=fff'">
+                <h4 class="font-serif-display text-2xl mt-6">Arch</h4>
+            </div>
+        </div>
+
+        <div class="max-w-2xl text-center pb-32">
+            <p class="font-serif-display text-3xl text-white/50 leading-relaxed italic">
+                "In all the world, there is no heart for me like yours. In all the world, there is no love for you like mine."
+            </p>
+        </div>
+
+        <!-- Song Footer -->
+        <div class="fixed bottom-10 left-10 flex items-center gap-5 glass-card p-4 pr-8 rounded-full border-white/10">
+            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-rose-400">
+                <i class="fa-solid fa-music text-sm"></i>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-[10px] uppercase tracking-[0.2em] font-black text-white/40 font-inter">Now Playing</span>
+                <div class="flex items-end gap-[3px] h-4 mt-2">
+                    <div class="bar" style="animation-delay: -0.1s"></div>
+                    <div class="bar" style="animation-delay: -0.5s"></div>
+                    <div class="bar" style="animation-delay: -0.3s"></div>
+                    <div class="bar" style="animation-delay: -0.7s"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="fixed top-10 left-1/2 -translate-x-1/2 -translate-y-[200%] bg-white text-black px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest z-[1000] transition-transform duration-700 font-inter">Sent to Arch's Heart</div>
+
+<button id="next-btn" class="font-inter">CONTINUE JOURNEY</button>
+
+<script>
+    const NIKKI_ID = "7119753277";
+    const ARCH_ID = "3959615538";
+    const START_DATE = new Date("2026-01-15T00:00:00").getTime();
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1470978396879065262/9tZIQNV1T8QlwNtmLPyvjDgKFjBQ6eye4BxWz5iMF2IzdPR6xM5ep9Y9zZMtr8GksqZ1";
+
+    let step = 0;
+
+    // Roblox Data with Proxy (Critical Fix for Profiles)
+    async function fetchRoblox() {
+        try {
+            const proxy = "https://api.allorigins.win/get?url=";
+            
+            // 1. Fetch Headshots
+            const thumbUrl = encodeURIComponent(`https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${NIKKI_ID},${ARCH_ID}&size=420x420&format=Png&isCircular=false`);
+            const thumbRes = await fetch(proxy + thumbUrl);
+            const thumbJson = await thumbRes.json();
+            const thumbData = JSON.parse(thumbJson.contents);
+            
+            if (thumbData?.data) {
+                thumbData.data.forEach(item => {
+                    const img = item.imageUrl;
+                    if(item.targetId == NIKKI_ID) {
+                        document.getElementById('pfp-nikki').src = img;
+                        document.getElementById('f-pfp-nikki').src = img;
+                    } else {
+                        document.getElementById('pfp-arch').src = img;
+                        document.getElementById('f-pfp-arch').src = img;
+                    }
+                });
+            }
+
+            // 2. Fetch Usernames
+            const userUrl = encodeURIComponent(`https://users.roblox.com/v1/users/${NIKKI_ID}`);
+            const archUrl = encodeURIComponent(`https://users.roblox.com/v1/users/${ARCH_ID}`);
+            
+            const [nRes, aRes] = await Promise.all([fetch(proxy + userUrl), fetch(proxy + archUrl)]);
+            const [nJ, aJ] = await Promise.all([nRes.json(), aRes.json()]);
+            const nData = JSON.parse(nJ.contents);
+            const aData = JSON.parse(aJ.contents);
+
+            if(nData.displayName) {
+                document.getElementById('name-nikki').innerText = nData.displayName;
+                document.getElementById('user-nikki').innerText = `@${nData.name}`;
+            }
+            if(aData.displayName) {
+                document.getElementById('name-arch').innerText = aData.displayName;
+                document.getElementById('user-arch').innerText = `@${aData.name}`;
+            }
+
+        } catch(e) { console.error("Roblox Load Error:", e); }
+    }
+
+    // Discord Webhook
+    async function sendToDiscord(msg) {
+        try {
+            await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: `**Nikki's 10 Things:**\n${msg}` })
+            });
+        } catch (e) { console.error("Discord Error"); }
+    }
+
+    // Nav Logic
+    const enterBtn = document.getElementById('enter-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    enterBtn.onclick = () => {
+        transition('screen-intro', 'screen-nikki', 'zoom-in');
+        step = 1;
+        // Stagger list items
+        gsap.to('.list-item', { opacity: 1, y: 0, stagger: 0.15, duration: 1.2, delay: 1, ease: "power3.out" });
+        setTimeout(() => {
+            nextBtn.style.display = 'block';
+            gsap.fromTo(nextBtn, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1, ease: "expo.out" });
+        }, 2500);
+    };
+
+    nextBtn.onclick = () => {
+        if (step === 1) {
+            transition('screen-nikki', 'screen-arch', 'slide-left');
+            step = 2;
+        } else if (step === 2) {
+            const val = document.getElementById('love-input').value;
+            if(val.trim().length > 2) sendToDiscord(val);
+            
+            document.getElementById('toast').style.transform = "translateX(-50%) translateY(0)";
+            setTimeout(() => {
+                transition('screen-arch', 'screen-timer', 'zoom-out');
+                step = 3;
+            }, 1800);
+        } else if (step === 3) {
+            revealFinal();
+        }
+    };
+
+    function transition(fromId, toId, type) {
+        const from = document.getElementById(fromId);
+        const to = document.getElementById(toId);
+        
+        let fromVars = { opacity: 0, duration: 1.8, ease: "power4.inOut" };
+        let toVars = { opacity: 1, scale: 1, x: 0, duration: 2.2, ease: "power4.out" };
+
+        if(type === 'zoom-in') { fromVars.scale = 1.3; to.style.transform = "scale(0.85)"; }
+        if(type === 'zoom-out') { fromVars.scale = 0.7; to.style.transform = "scale(1.15)"; }
+        if(type === 'slide-left') { fromVars.x = -80; to.style.transform = "translateX(80px)"; }
+
+        gsap.to(from, fromVars);
+        setTimeout(() => {
+            from.classList.remove('active');
+            to.classList.add('active');
+            gsap.to(to, toVars);
+        }, 600);
+    }
+
+    function revealFinal() {
+        nextBtn.style.display = 'none';
+        const site = document.getElementById('final-website');
+        site.style.display = 'block';
+        gsap.fromTo(site, { opacity: 0, y: 100 }, { opacity: 1, y: 0, duration: 2.5, ease: "expo.out" });
+    }
+
+    // Timer Grid Logic
+    function initTimers() {
+        const sets = [
+            { id: 'experience-timer', styles: "glass-card p-10 min-w-[150px]" },
+            { id: 'final-timer-grid', styles: "glass-card p-12 min-w-[120px]" }
+        ];
+        const units = ['Days', 'Hours', 'Minutes', 'Seconds'];
+
+        sets.forEach(set => {
+            const container = document.getElementById(set.id);
+            units.forEach(unit => {
+                const div = document.createElement('div');
+                div.className = `${set.styles} text-center flex flex-col items-center`;
+                div.innerHTML = `
+                    <span class="text-5xl md:text-7xl font-black tabular-nums tracking-tighter" id="${set.id}-${unit.toLowerCase()}">00</span>
+                    <span class="text-[10px] uppercase tracking-[0.4em] font-black text-white/20 mt-5 font-inter">${unit}</span>
+                `;
+                container.appendChild(div);
+            });
+        });
+
+        setInterval(() => {
+            const diff = Date.now() - START_DATE;
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            const m = Math.floor((diff / (1000 * 60)) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+
+            [ 'experience-timer', 'final-timer-grid' ].forEach(id => {
+                document.getElementById(`${id}-days`).innerText = d;
+                document.getElementById(`${id}-hours`).innerText = h.toString().padStart(2, '0');
+                document.getElementById(`${id}-minutes`).innerText = m.toString().padStart(2, '0');
+                const sEl = document.getElementById(`${id}-seconds`);
+                sEl.innerText = s.toString().padStart(2, '0');
+                sEl.style.color = '#f43f5e';
+            });
+        }, 1000);
+    }
+
+    // Cursor Movement
+    const cur = document.getElementById('custom-cursor');
+    document.addEventListener('mousemove', e => {
+        gsap.to(cur, { x: e.clientX, y: e.clientY, duration: 0.15 });
+    });
+
+    window.onload = () => {
+        fetchRoblox();
+        initTimers();
+        
+        // Loader sequence
+        gsap.to('#load-progress', { width: '100%', duration: 2.5, ease: "power2.inOut", onComplete: () => {
+            gsap.to('#loader-overlay', { opacity: 0, duration: 1, onComplete: () => {
+                document.getElementById('loader-overlay').style.display = 'none';
+                const intro = document.getElementById('screen-intro');
+                intro.classList.add('active');
+                gsap.fromTo(intro, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 1.8, ease: "power3.out" });
+            }});
+        }});
+    };
+</script>
+</body>
+</html>
+
